@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Galaxy Book4 Edge - Evaluación Técnica</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f9f9f9; color: #333; }
+    header { background: #0057b7; color: white; padding: 2rem; text-align: center; }
+    nav { display: flex; flex-wrap: wrap; justify-content: center; background: #e0e0e0; }
+    nav button { padding: 1rem; margin: 0.5rem; border: none; background: #ffffff; cursor: pointer; font-weight: bold; border-radius: 5px; }
+    nav button:hover { background: #d0d0d0; }
+    section { display: none; padding: 2rem; max-width: 1000px; margin: auto; }
+    section.active { display: block; }
+    h2 { color: #0057b7; margin-bottom: 1rem; }
+    ul { padding-left: 1.5rem; line-height: 1.8; }
+    p { font-size: 1.1rem; line-height: 1.7; }
+    .emoji { font-size: 2rem; margin-right: 0.5rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>💻 Galaxy Book4 Edge</h1>
+    <p>Evaluación técnica y argumentos de compra</p>
+  </header>
+
+  <nav>
+    <button onclick="showTab('garantia')">🛡️ Garantía</button>
+    <button onclick="showTab('fallo')">🧰 Fallos</button>
+    <button onclick="showTab('amazon')">🛒 Amazon</button>
+    <button onclick="showTab('por_que')">💡 ¿Por qué una Galaxy Book4 Edge?</button>
+    <button onclick="showTab('arm')">🧬 Arquitectura ARM</button>
+    <button onclick="showTab('vendedor')">🏪 Vendedor</button>
+    <button onclick="showTab('conclusion')">🎯 Conclusión</button>
+  </nav>
+
+  <main>
+    <section id="garantia" class="active">
+      <h2><span class="emoji">🛡️</span> Garantía oficial Samsung</h2>
+      <ul>
+        <li>1 año de garantía internacional limitada.</li>
+        <li>Registro en Samsung para activar soporte técnico.</li>
+        <li>Aplica si se compra directamente a Samsung o distribuidores autorizados en Amazon.</li>
+      </ul>
+    </section>
+
+    <section id="fallo">
+      <h2><span class="emoji">🧰</span> ¿Qué hacer si falla?</h2>
+      <ul>
+        <li>Samsung ofrece soporte técnico presencial y remoto.</li>
+        <li>App Samsung Members permite diagnóstico desde el equipo.</li>
+        <li>Actualizaciones corrigen errores comunes (BIOS, batería, etc.).</li>
+        <li>La garantía cubre piezas y mano de obra durante el primer año.</li>
+      </ul>
+    </section>
+
+    <section id="amazon">
+      <h2><span class="emoji">🛒</span> ¿Es seguro comprar en Amazon?</h2>
+      <ul>
+        <li>Amazon ofrece protección al comprador y devoluciones gratuitas.</li>
+        <li>Producto vendido directamente por Amazon.com (no terceros).</li>
+        <li>Envío rastreado y seguro a Colombia.</li>
+        <li>Garantía de autenticidad y posibilidad de devolución si hay fallos.</li>
+      </ul>
+    </section>
+
+    <section id="por_que">
+      <h2><span class="emoji">💡</span> ¿Por qué una Galaxy Book4 Edge?</h2>
+      <ul>
+        <li>Pantalla AMOLED 15.6” antirreflejo: ideal para productividad y visualización.</li>
+        <li>Procesador Snapdragon X Plus con arquitectura ARM: silencioso, eficiente y con IA integrada.</li>
+        <li>Batería de larga duración ideal para jornadas completas sin recarga.</li>
+        <li>Subtítulos en vivo, encendido instantáneo y compatibilidad con Copilot de Windows.</li>
+        <li>Perfecta para tareas de oficina, navegación, edición ligera y videollamadas.</li>
+      </ul>
+    </section>
+
+    <section id="arm">
+      <h2><span class="emoji">🧬</span> Importancia de la arquitectura ARM</h2>
+      <ul>
+        <li>Más eficiente, menos calor, mayor duración de batería.</li>
+        <li>Encendido instantáneo y rendimiento silencioso.</li>
+        <li>Integración con Copilot y funciones de IA.</li>
+        <li>ARM ya domina en móviles y ahora revoluciona los portátiles.</li>
+      </ul>
+    </section>
+
+    <section id="vendedor">
+      <h2><span class="emoji">🏪</span> ¿Quién vende este modelo?</h2>
+      <ul>
+        <li>Vendido por Amazon.com directamente.</li>
+        <li>También disponible en Mercado Libre por ClubEnvíos (desde Miami).</li>
+        <li>Ambos ofrecen garantía, soporte y devolución.</li>
+      </ul>
+    </section>
+
+    <section id="conclusion">
+      <h2><span class="emoji">🎯</span> Conclusión</h2>
+      <p><em>Este equipo representa una apuesta sólida por eficiencia, diseño y tecnología de vanguardia. Su arquitectura ARM, soporte oficial y respaldo de Amazon lo convierten en una opción confiable para quienes buscan rendimiento moderno y compatibilidad con herramientas de IA.</em></p>
+    </section>
+  </main>
+
+  <script>
+    function showTab(id) {
+      document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+  </script>
+</body>
+</html>
