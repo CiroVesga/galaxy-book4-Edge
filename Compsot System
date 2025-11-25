@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Compost System · Avante 2025</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    :root{
+      --bg:#040810;
+      --panel:#0d1727;
+      --panel-alt:#152035;
+      --border:#1f3653;
+      --text:#f4f8ff;
+      --muted:#9bb6d9;
+      --accent:#3ec0ff;
+      --accent-dark:#1f6dd8;
+      --green:#29d398;
+      --red:#f95f62;
+      --yellow:#f7c948;
+      --title:'Montserrat',sans-serif;
+      --body:'Inter',sans-serif;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--body);background:var(--bg);color:var(--text);padding:130px 24px 120px}
+    header{
+      position:fixed;top:0;left:0;right:0;min-height:110px;padding:16px 28px;
+      display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
+      background:rgba(8,14,26,.94);border-bottom:1px solid rgba(62,192,255,.35);
+      box-shadow:0 16px 32px rgba(0,0,0,.6);backdrop-filter:blur(18px);z-index:1000;
+    }
+    .brand{min-width:220px;flex:1 1 200px}
+    .brand strong{font-family:var(--title);font-size:28px;letter-spacing:3px;line-height:1}
+    .brand small{color:var(--muted);letter-spacing:4px;font-size:11px;text-transform:uppercase}
+    nav{
+      display:flex;gap:10px;flex-wrap:wrap;
+      justify-content:center;flex:1 1 420px;
+      min-width:320px;
+    }
+    .global-actions{
+      display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;
+      flex:1 1 240px;min-width:200px;
+    }
+    @media(max-width:1200px){
+      header{justify-content:center;text-align:center}
+      nav{flex-basis:100%;justify-content:center}
+      .global-actions{flex-basis:100%;justify-content:center}
+    }
+    @media(max-width:720px){
+      .nav-btn{font-size:12px}
+    }
+    .nav-btn{
+      display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:12px;
+      border:1px solid rgba(62,192,255,.4);color:var(--text);background:rgba(21,35,57,.85);
+      font-family:var(--title);font-size:13px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:.3s;
+      white-space:nowrap;
+    }
+    .nav-btn.utility{font-size:12px;border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.05)}
+    .nav-btn:hover,.nav-btn.active{background:var(--accent);color:#05162b;border-color:transparent;box-shadow:0 8px 22px rgba(62,192,255,.3)}
+    .global-actions{
+      display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;
+      flex:1 1 240px;min-width:200px;
+    }
+    @media(max-width:1200px){
+      header{justify-content:center;text-align:center}
+      nav{flex-basis:100%;justify-content:center}
+      .global-actions{flex-basis:100%;justify-content:center}
+    }
+    @media(max-width:720px){
+      .nav-btn{font-size:12px}
+    }
+    main{max-width:1280px;margin:0 auto}
+    .section{
+      display:none;background:var(--panel);border:1px solid rgba(255,255,255,.05);
+      border-radius:22px;padding:40px;margin-bottom:60px;box-shadow:0 25px 60px rgba(0,0,0,.55);position:relative
+    }
+    .section.active{display:block}
+    .section.minimized{height:90px;overflow:hidden;opacity:.75;cursor:pointer}
+    .section.minimized::after{content:"Panel minimizado • clic para restaurar";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--muted);letter-spacing:2px}
+    .section.maximized{position:fixed;top:120px;left:50%;transform:translateX(-50%);width:calc(100% - 60px);height:calc(100vh - 140px);overflow:auto;z-index:1200}
+    .chrome-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+    .chrome-dots{display:flex;gap:10px}
+    .chrome-dots span{width:16px;height:16px;border-radius:50%;cursor:pointer}
+    .dot-close{background:var(--red)}
+    .dot-min{background:var(--yellow)}
+    .dot-max{background:var(--green)}
+    h1{font-family:var(--title);font-size:32px;text-transform:uppercase;letter-spacing:4px;margin-bottom:10px}
+    h2{font-family:var(--title);font-size:24px;margin:28px 0 14px;color:var(--accent)}
+    h3{font-family:var(--title);font-size:18px;color:var(--accent)}
+    p.lead{color:var(--muted);font-size:16px;margin-bottom:18px}
+    .grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+    .info-card{background:var(--panel-alt);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:18px}
+    .info-card h4{font-family:var(--title);font-size:14px;letter-spacing:1px;margin-bottom:8px;color:var(--accent)}
+    .info-card p{font-size:14px;color:var(--text)}
+    .btn{padding:10px 18px;border-radius:12px;border:1px solid var(--accent);background:transparent;color:var(--text);font-family:var(--title);font-size:12px;text-transform:uppercase;letter-spacing:1px;cursor:pointer;transition:.3s}
+    .btn i{margin-right:6px}
+    .btn:hover{background:var(--accent);color:#05162b}
+    .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:18px}
+    .card{background:var(--panel-alt);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px}
+    .media-slot{height:160px;border-radius:14px;border:1px dashed rgba(255,255,255,.3);display:grid;place-items:center;background:#071225;cursor:pointer;overflow:hidden}
+    .media-slot img{width:100%;height:100%;object-fit:cover}
+    textarea{width:100%;min-height:90px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:#061127;color:var(--text);padding:10px;font-family:var(--body)}
+    table{width:100%;border-collapse:collapse}
+    th,td{border:1px solid rgba(255,255,255,.08);padding:10px;text-align:left}
+    th{background:#132341;color:var(--accent);font-family:var(--title);font-size:12px;letter-spacing:1px}
+    td[contenteditable="true"]{background:rgba(255,255,255,.02)}
+    td[contenteditable="true"]:focus{outline:2px solid var(--accent)}
+    .chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:18px}
+    .chart-card{background:var(--panel-alt);border-radius:18px;padding:16px;border:1px solid rgba(255,255,255,.05)}
+    .impact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:20px}
+    .impact-card{padding:14px;border-radius:14px;text-align:center;font-family:var(--title)}
+    .impact-card.positive{background:rgba(39,211,152,.15);border:1px solid rgba(39,211,152,.4);color:#b7ffe0}
+    .impact-card.negative{background:rgba(249,95,98,.18);border:1px solid rgba(249,95,98,.4);color:#ffd7d7}
+    .steam-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+    .steam-card{background:var(--panel-alt);border-radius:18px;border:1px solid rgba(255,255,255,.08);padding:18px;display:flex;flex-direction:column;gap:14px}
+    .steam-media{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .steam-card table{font-size:13px;margin-top:10px}
+    .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+    .toolbar button,.toolbar select,.toolbar input[type="color"]{background:#0b1a32;border:1px solid rgba(255,255,255,.08);color:var(--text);padding:6px 10px;border-radius:8px;font-size:12px;cursor:pointer}
+    .essay-editor{min-height:200px;background:#091429;border:1px solid #1b2b4a;border-radius:12px;padding:14px;font-size:16px;line-height:1.7}
+    .essay-editor:focus{outline:2px solid var(--accent)}
+    #dock{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);display:flex;gap:12px;padding:12px 20px;border-radius:40px;background:rgba(5,8,16,.9);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(12px);z-index:1000}
+    #dock button{width:46px;height:46px;border-radius:50%;border:1px solid rgba(255,255,255,.1);background:var(--panel-alt);color:var(--text);font-size:16px;cursor:pointer;transition:.3s}
+    #dock button.active,#dock button:hover{background:var(--accent);color:#041428}
+    body.exporting header,body.exporting #dock{display:none}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand"><small>Compost System</small><strong>Avante 2025</strong></div>
+    <nav>
+      <button class="nav-btn active" data-section="lobby" onclick="setSection('lobby')"><i class="fa-solid fa-house"></i> Lobby</button>
+      <button class="nav-btn" data-section="espanol" onclick="setSection('espanol')"><i class="fa-solid fa-book"></i> Español</button>
+      <button class="nav-btn" data-section="sociales" onclick="setSection('sociales')"><i class="fa-solid fa-seedling"></i> Sociales</button>
+      <button class="nav-btn" data-section="math" onclick="setSection('math')"><i class="fa-solid fa-chart-line"></i> Math</button>
+      <button class="nav-btn" data-section="steam" onclick="setSection('steam')"><i class="fa-solid fa-flask"></i> STEAM</button>
+      <button class="nav-btn" data-section="essays" onclick="setSection('essays')"><i class="fa-solid fa-pen-nib"></i> Essays</button>
+    </nav>
+    <div class="global-actions">
+      <button class="nav-btn" onclick="exportAllJSON()"><i class="fa-solid fa-file-export"></i> Exportar JSON</button>
+      <button class="nav-btn" onclick="document.getElementById('global-import').click()"><i class="fa-solid fa-file-import"></i> Importar JSON</button>
+      <button class="nav-btn" onclick="exportImage()"><i class="fa-solid fa-image"></i> Exportar Imagen</button>
+      <input type="file" id="global-import" accept="application/json" style="display:none" />
+    </div>
+  </header>
+
+  <main>
+    <!-- Lobby -->
+    <section id="lobby" class="section active">
+      <div class="chrome-bar">
+        <div class="chrome-dots">
+          <span class="dot-close" data-action="close"></span>
+          <span class="dot-min" data-action="min"></span>
+          <span class="dot-max" data-action="max"></span>
+        </div>
+      </div>
+      <h1>Compost Mission Hub</h1>
+      <p class="lead">Panel maestro para navegar, documentar y presentar el Compost System de Avante 2025.</p>
+      <div class="grid-4">
+        <div class="info-card" onclick="setSection('espanol')"><h4>Español</h4><p>Galería editable + Poemario</p></div>
+        <div class="info-card" onclick="setSection('sociales')"><h4>Sociales</h4><p>Folleto Vermicompostaje</p></div>
+        <div class="info-card" onclick="setSection('math')"><h4>Matemáticas</h4><p>Data Tracker + Integer Poster</p></div>
+        <div class="info-card" onclick="setSection('steam')"><h4>STEAM Lab</h4><p>Worksheet con tablas y gráficos</p></div>
+        <div class="info-card" onclick="setSection('essays')"><h4>Essays</h4><p>Science + English editor</p></div>
+      </div>
+    </section>
+
+    <!-- Español -->
+    <section id="espanol" class="section">
+      <div class="chrome-bar">
+        <div class="chrome-dots">
+          <span class="dot-close" data-action="close"></span>
+          <span class="dot-min" data-action="min"></span>
+          <span class="dot-max" data-action="max"></span>
+        </div>
+      </div>
+      <h1>Registro Español · Bananín</h1>
+      <p class="lead">Documenta el ciclo de la banana y genera poemas sobre el paso del tiempo.</p>
+      <div class="grid-4">
+        <div class="info-card" contenteditable="true"><h4>Definición</h4><p>El compostaje transforma residuos orgánicos en abono estable.</p></div>
+        <div class="info-card" contenteditable="true"><h4>Residuo Orgánico</h4><p>Cáscaras, frutas, verduras, posos de café, hojas.</p></div>
+        <div class="info-card" contenteditable="true"><h4>Recomendaciones</h4><p>Balancear verdes/marrones, airear semanalmente.</p></div>
+        <div class="info-card" contenteditable="true"><h4>Hipótesis</h4><p>Un 3:1 constante acelera la maduración del compost.</p></div>
+      </div>
+      <div style="margin:20px 0">
+        <button class="btn" onclick="addDayCard()"><i class="fa fa-plus"></i> Añadir Día</button>
+        <button class="btn" onclick="exportSpanishJSON()"><i class="fa fa-download"></i> Exportar JSON</button>
+        <button class="btn" onclick="document.getElementById('spanish-import').click()"><i class="fa fa-upload"></i> Importar JSON</button>
+        <input type="file" id="spanish-import" accept="application/json" style="display:none" />
+      </div>
+      <div id="spanish-gallery" class="gallery"></div>
+      <input type="file" id="spanish-upload" accept="image/*" style="display:none" />
+      <h2>Poemario</h2>
+      <div class="card" contenteditable="true"><h3>Matías</h3><p>Escribe aquí el poema de Matías...</p></div>
+      <div class="card" contenteditable="true"><h3>María del Mar</h3><p>Escribe aquí el poema de María del Mar...</p></div>
+      <div class="card" contenteditable="true"><h3>Ciro</h3><p>El brillo no dura siempre...</p></div>
+    </section>
+
+    <!-- Sociales -->
+    <section id="sociales" class="section">
+      <div class="chrome-bar">
+        <div class="chrome-dots">
+          <span class="dot-close" data-action="close"></span>
+          <span class="dot-min" data-action="min"></span>
+          <span class="dot-max" data-action="max"></span>
+        </div>
+      </div>
+      <h1>Sociales · Vermicompostaje</h1>
+      <p class="lead">Folleto extendido para informar a familias y comunidad.</p>
+      <div style="background:var(--panel-alt);padding:24px;border-radius:18px;border:1px solid rgba(255,255,255,.08);display:grid;gap:18px">
+        <article contenteditable="true">
+          <h2>Resumen Ejecutivo</h2>
+          <p>El vermicompostaje conecta la separación de residuos con la producción de humus rico en microorganismos para la huerta escolar.</p>
+        </article>
+        <article contenteditable="true">
+          <h2>Definición técnica</h2>
+          <p>Proceso biológico controlado donde lombrices Eisenia fetida degradan residuos orgánicos, produciendo humus estable y lixiviados nutritivos.</p>
+        </article>
+        <article>
+          <h2>Lista de residuos permitidos / evitar</h2>
+          <div class="grid-4" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+            <div class="info-card" contenteditable="true"><h4>Verdes</h4><p>Frutas, verduras, pasto fresco.</p></div>
+            <div class="info-card" contenteditable="true"><h4>Marrones</h4><p>Hojas secas, cartón sin tinta, aserrín.</p></div>
+            <div class="info-card" contenteditable="true"><h4>Evitar</h4><p>Carnes, lácteos, aceites, cítricos en exceso.</p></div>
+            <div class="info-card" contenteditable="true"><h4>Control</h4><p>Humedad 60-80%, aireación constante.</p></div>
+          </div>
+        </article>
+        <article>
+          <h2>Timeline del proceso</h2>
+          <div class="timeline">
+            <div contenteditable="true"><strong>Semana 1</strong> · Preparar cama con cartón humedecido y lombrices.</div>
+            <div contenteditable="true"><strong>S. 2-3</strong> · Alimentar con capas finas alternando verdes/marrones.</div>
+            <div contenteditable="true"><strong>S. 4-6</strong> · Maduración controlada, remover, medir temperatura.</div>
+            <div contenteditable="true"><strong>Semana 8+</strong> · Cosechar humus, tamizar, aplicar en huerta.</div>
+          </div>
+        </article>
+        <article contenteditable="true">
+          <h2>Linea editorial / CTA</h2>
+          <p>Conecta el hogar con la escuela: comparte datos, fotos y resultados de compost para fortalecer la cultura ambiental.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Math -->
+    <section id="math" class="section">
+      <div class="chrome-bar">
+        <div class="chrome-dots">
+          <span class="dot-close" data-action="close"></span>
+          <span class="dot-min" data-action="min"></span>
+          <span class="dot-max" data-action="max"></span>
+        </div>
+      </div>
+      <h1>Math Lab · Compost Analytics</h1>
+      <p class="lead">Data Tracker Guide e Integer Poster Guide con tablas editables y gráficas.</p>
+
+      <h2>Data Tracker Guide</h2>
+      <div style="overflow-x:auto">
+        <table class="data-table" id="tracker-table">
+          <thead>
+            <tr><th>Semana</th><th>Residuos (kg)</th><th>Compost (kg)</th><th>Ratio</th><th>Ratio simplificado</th><th>Constante k</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <button class="btn" onclick="addTrackerRow()"><i class="fa fa-plus"></i> Añadir semana</button>
+
+      <div class="chart-grid">
+        <div class="chart-card"><h3>Tendencia lineal</h3><canvas id="trackerLine"></canvas></div>
+        <div class="chart-card"><h3>Dispersión & Slope</h3><canvas id="trackerScatter"></canvas></div>
+        <div class="chart-card"><h3>k por semana</h3><canvas id="trackerBar"></canvas></div>
+        <div class="chart-card"><h3>Composición</h3><canvas id="trackerPie"></canvas></div>
+      </div>
+
+      <h2>Integer Poster Guide</h2>
+      <p class="lead">Enteros positivos y negativos para narrar el impacto ambiental.</p>
+      <div style="overflow-x:auto">
+        <table class="data-table" id="integer-table">
+          <thead><tr><th>Semana</th><th>Impacto + (kg)</th><th>Impacto - (kg)</th><th>Neto</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <button class="btn" onclick="addIntegerRow()"><i class="fa fa-plus"></i> Añadir registro</button>
+      <div class="impact-grid" id="impact-grid"></div>
+      <div class="card" style="text-align:center">
+        <h3>Impacto total mensual</h3>
+        <p id="impact-total" style="font-size:32px;font-family:var(--title)">+0 kg</p>
+      </div>
+    </section>
+
+    <!-- STEAM -->
+    <section id="steam" class="section">
+      <div class="chrome-bar">
+        <div class="chrome-dots">
+          <span class="dot-close" data-action="close"></span>
+          <span class="dot-min" data-action="min"></span>
+          <span class="dot-max" data-action="max"></span>
+        </div>
+      </div>
+      <h1>STEAM Lab Worksheet</h1>
+      <p class="lead">Documenta tus experimentos con imágenes, tablas y gráficas dinámicas.</p>
+      <div class="grid-4">
+        <div class="info-card" contenteditable="true"><h4>Definición de Compostaje</h4><p>Transformación controlada de residuos orgánicos en abono.</p></div>
+        <div class="info-card" contenteditable="true"><h4>Residuo Orgánico</h4><p>Cáscaras, vegetales, posos de café, hojas.</p></div>
+        <div class="info-card" contenteditable="true"><h4>Recomendaciones</h4><p>Proporción 3:1, aireación y humedad constante.</p></div>
+        <div class="info-card" contenteditable="true"><h4>Hipótesis</h4><p>Si la mezcla se mantiene equilibrada, el proceso tarda 8 semanas.</p></div>
+      </div>
+
+      <h2>Registro de evidencias</h2>
+      <div class="steam-grid" id="steam-gallery"></div>
+      <button class="btn" onclick="addSteamCard()"><i class="fa fa-plus"></i> añadir evidencia</button>
+      <input type="file" id="steam-upload" accept="image/*" style="display:none" />
+
+      <h2>Tabla dinámica</h2>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+        <input type="text" id="steam-new-col" placeholder="Nueva columna" style="padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:#10182d;color:var(--text)">
+        <button class="btn" onclick="addSteamColumn()"><i class="fa fa-plus"></i> Columna</button>
+        <button class="btn" onclick="addSteamRow()"><i class="fa fa-plus"></i> Fila</button>
+      </div>
+      <div class="table-wrapper">
+        <table id="steam-table">
+          <thead></thead><tbody></tbody>
+        </table>
+      </div>
+
+      <div class="card" style="margin-top:20px">
+        <h3>Convertir tabla en gráfico</h3>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+          <select id="steam-x"></select>
+          <select id="steam-y"></select>
+          <select id="steam-chart-type">
+            <option value="line">Lineal</option>
+            <option value="bar">Barras</option>
+            <option value="radar">Radar</option>
+            <option value="doughnut">Doughnut</option>
+            <option value="polarArea">Polar</option>
+          </select>
+          <button class="btn" onclick="buildSteamChart()"><i class="fa fa-chart-line"></i> Generar</button>
+        </div>
+        <canvas id="steamChart" height="320"></canvas>
+      </div>
+    </section>
+
+    <!-- Essays / Need to know -->
+    <section id="essays" class="section">
+      <div class="chrome-bar">
+        <div class="chrome-dots">
+          <span class="dot-close" data-action="close"></span>
+          <span class="dot-min" data-action="min"></span>
+          <span class="dot-max" data-action="max"></span>
+        </div>
+      </div>
+      <h1>Need to Know · Essays</h1>
+      <div class="grid-4">
+        <div class="info-card" contenteditable="true"><h4>Definición de compostaje</h4><p>Describe el proceso y su importancia.</p></div>
+        <div class="info-card" contenteditable="true"><h4>Residuo orgánico</h4><p>Materiales permitidos y prohibidos.</p></div>
+        <div class="info-card" contenteditable="true"><h4>Recomendaciones</h4><p>Buenas prácticas para el aula.</p></div>
+        <div class="info-card" contenteditable="true"><h4>Hipótesis</h4><p>Predicción sobre el experimento.</p></div>
+      </div>
+
+      <div class="card">
+        <div class="toolbar">
+          <button onclick="applyFormat('bold')"><i class="fa fa-bold"></i></button>
+          <button onclick="applyFormat('italic')"><i class="fa fa-italic"></i></button>
+          <button onclick="applyFormat('underline')"><i class="fa fa-underline"></i></button>
+          <button onclick="applyFormat('justifyLeft')"><i class="fa fa-align-left"></i></button>
+          <button onclick="applyFormat('justifyCenter')"><i class="fa fa-align-center"></i></button>
+          <button onclick="applyFormat('justifyRight')"><i class="fa fa-align-right"></i></button>
+          <select onchange="applyFormat('fontName',this.value)">
+            <option value="Inter">Inter</option>
+            <option value="Montserrat">Montserrat</option>
+            <option value="Georgia">Georgia</option>
+          </select>
+          <select onchange="applyFormat('fontSize',this.value)">
+            <option value="2">12px</option>
+            <option value="3" selected>14px</option>
+            <option value="4">16px</option>
+            <option value="5">18px</option>
+          </select>
+          <input type="color" value="#ffffff" onchange="applyFormat('foreColor',this.value)">
+        </div>
+        <h3>Science Essay</h3>
+        <div id="essay-science" class="essay-editor" contenteditable="true">Describe aquí el impacto científico del compost.</div>
+        <h3>English Essay</h3>
+        <div id="essay-english" class="essay-editor" contenteditable="true">Write a persuasive piece about composting benefits.</div>
+      </div>
+    </section>
+  </main>
+
+  <div id="dock">
+    <button data-section="lobby" onclick="setSection('lobby')" title="Lobby"><i class="fa fa-house"></i></button>
+    <button data-section="espanol" onclick="setSection('espanol')" title="Español"><i class="fa fa-book"></i></button>
+    <button data-section="sociales" onclick="setSection('sociales')" title="Sociales"><i class="fa fa-seedling"></i></button>
+    <button data-section="math" onclick="setSection('math')" title="Math"><i class="fa fa-chart-line"></i></button>
+    <button data-section="steam" onclick="setSection('steam')" title="STEAM"><i class="fa fa-flask"></i></button>
+    <button data-section="essays" onclick="setSection('essays')" title="Essays"><i class="fa fa-pen"></i></button>
+  </div>
+
+  <script>
+    const sections=document.querySelectorAll('.section');
+    const navButtons=document.querySelectorAll('.nav-btn[data-section]');
+    const dockButtons=document.querySelectorAll('#dock button[data-section]');
+
+    function setSection(id){
+      const target=document.getElementById(id);
+      const fallback=document.getElementById('lobby');
+      sections.forEach(sec=>{
+        sec.classList.remove('active','minimized','maximized');
+        sec.style.display='none';
+      });
+      const show=target||fallback;
+      show.style.display='block';
+      show.classList.add('active');
+
+      navButtons.forEach(btn=>btn.classList.toggle('active',btn.dataset.section===show.id));
+      dockButtons.forEach(btn=>btn.classList.toggle('active',btn.dataset.section===show.id));
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    // Chrome buttons
+    document.addEventListener('click',e=>{
+      const dot=e.target.closest('.chrome-dots span');
+      if(!dot) return;
+      const section=dot.closest('.section');
+      const action=dot.dataset.action;
+      if(action==='close'){section.style.display='none';return;}
+      if(action==='min'){section.classList.add('minimized');section.addEventListener('click',()=>section.classList.remove('minimized'),{once:true});return;}
+      if(action==='max'){section.classList.toggle('maximized');}
+    });
+
+    // Spanish Gallery
+    let spanishDays=[
+      {title:'Día 1',desc:'Bananín firme, amarillo brillante.',image:''},
+      {title:'Día 2',desc:'Primeras manchas marrones.',image:''},
+      {title:'Día 3',desc:'Maduración intensa.',image:''}
+    ];
+    let spanishTarget=null;
+    const spanishUpload=document.getElementById('spanish-upload');
+    function renderSpanish(){
+      const container=document.getElementById('spanish-gallery');
+      container.innerHTML='';
+      spanishDays.forEach((day,index)=>{
+        const card=document.createElement('div');card.className='card';
+        card.innerHTML=`
+          <h3>${day.title}</h3>
+          <div class="media-slot" data-index="${index}">
+            ${day.image?`<img src="${day.image}" alt="${day.title}">`:'<span>Sube una imagen</span>'}
+          </div>
+          <textarea oninput="spanishDays[${index}].desc=this.value">${day.desc}</textarea>
+        `;
+        container.appendChild(card);
+      });
+      container.querySelectorAll('.media-slot').forEach(slot=>slot.addEventListener('click',()=>{spanishTarget=slot.dataset.index;spanishUpload.click();}));
+    }
+    spanishUpload.addEventListener('change',e=>{
+      const file=e.target.files[0];if(!file) return;
+      const reader=new FileReader();reader.onload=evt=>{spanishDays[spanishTarget].image=evt.target.result;renderSpanish();};reader.readAsDataURL(file);
+    });
+    function addDayCard(){spanishDays.push({title:`Día ${spanishDays.length+1}`,desc:'Describir cambio...',image:''});renderSpanish();}
+    function exportSpanishJSON(){const blob=new Blob([JSON.stringify(spanishDays,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bananin.json';a.click();}
+    document.getElementById('spanish-import').addEventListener('change',e=>{
+      const file=e.target.files[0];if(!file) return;
+      const reader=new FileReader();reader.onload=evt=>{spanishDays=JSON.parse(evt.target.result);renderSpanish();};reader.readAsText(file);
+    });
+
+    // Math Data
+    let trackerData=[
+      {week:'Semana 1',waste:30,compost:10},
+      {week:'Semana 2',waste:27,compost:9},
+      {week:'Semana 3',waste:33,compost:11},
+      {week:'Semana 4',waste:30,compost:10}
+    ];
+    let integerData=[
+      {week:'Semana 1',positive:8,negative:-3},
+      {week:'Semana 2',positive:7,negative:-4},
+      {week:'Semana 3',positive:9,negative:-2},
+      {week:'Semana 4',positive:10,negative:-3}
+    ];
+    let trackerCharts={};
+
+    function renderTracker(){
+      const tbody=document.querySelector('#tracker-table tbody');
+      tbody.innerHTML='';
+      trackerData.forEach((row,index)=>{
+        const ratio=`${row.waste}:${row.compost}`;
+        const gcd=(a,b)=>b?gcd(b,a%b):a;
+        const simplified=`${row.waste/gcd(row.waste,row.compost)}:${row.compost/gcd(row.waste,row.compost)}`;
+        const k=row.compost/row.waste;
+        const tr=document.createElement('tr');
+        tr.innerHTML=`
+          <td contenteditable="true" onblur="trackerData[${index}].week=this.innerText">${row.week}</td>
+          <td contenteditable="true" onblur="trackerData[${index}].waste=parseFloat(this.innerText)||0">${row.waste}</td>
+          <td contenteditable="true" onblur="trackerData[${index}].compost=parseFloat(this.innerText)||0">${row.compost}</td>
+          <td>${ratio}</td>
+          <td>${simplified}</td>
+          <td>${k.toFixed(3)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+      updateTrackerCharts();
+    }
+    function addTrackerRow(){trackerData.push({week:`Semana ${trackerData.length+1}`,waste:30,compost:10});renderTracker();}
+
+    function updateTrackerCharts(){
+      const labels=trackerData.map(r=>r.week);
+      const waste=trackerData.map(r=>r.waste);
+      const compost=trackerData.map(r=>r.compost);
+      const kVals=trackerData.map(r=>r.compost/r.waste);
+      Object.values(trackerCharts).forEach(chart=>chart.destroy());
+      trackerCharts.line=new Chart(document.getElementById('trackerLine'),{
+        type:'line',data:{labels,datasets:[{label:'Residuos',data:waste,borderColor:'#3ec0ff',tension:.4},{label:'Compost',data:compost,borderColor:'#29d398',tension:.4}]},
+        options:{plugins:{legend:{labels:{color:'#f4f8ff'}}},scales:{x:{ticks:{color:'#9bb6d9'},grid:{color:'rgba(255,255,255,.08)'}},y:{ticks:{color:'#9bb6d9'},grid:{color:'rgba(255,255,255,.08)'}}}}
+      });
+      const avgK=kVals.reduce((a,b)=>a+b,0)/kVals.length;
+      trackerCharts.scatter=new Chart(document.getElementById('trackerScatter'),{
+        type:'scatter',data:{datasets:[{label:'Datos',data:trackerData.map(r=>({x:r.waste,y:r.compost})),backgroundColor:'#ff6b6b'},
+        {type:'line',label:`y=${avgK.toFixed(2)}x`,data:[{x:0,y:0},{x:40,y:40*avgK}],borderColor:'#f7c948',borderWidth:2,fill:false} ]},
+        options:{plugins:{legend:{labels:{color:'#f4f8ff'}}},scales:{x:{ticks:{color:'#9bb6d9'}},y:{ticks:{color:'#9bb6d9'}}}}
+      });
+      trackerCharts.bar=new Chart(document.getElementById('trackerBar'),{
+        type:'bar',data:{labels,datasets:[{label:'Constante k',data:kVals,backgroundColor:'#1f6dd8'}]},
+        options:{plugins:{legend:{labels:{color:'#f4f8ff'}}},scales:{x:{ticks:{color:'#9bb6d9'}},y:{ticks:{color:'#9bb6d9'}}}}
+      });
+      trackerCharts.pie=new Chart(document.getElementById('trackerPie'),{
+        type:'doughnut',data:{labels:['Residuos','Compost','Pérdida'],datasets:[{data:[waste.reduce((a,b)=>a+b,0),compost.reduce((a,b)=>a+b,0),waste.reduce((a,b)=>a+b,0)-compost.reduce((a,b)=>a+b,0)],backgroundColor:['#3ec0ff','#29d398','#ff6b6b']}]}},
+        options:{plugins:{legend:{labels:{color:'#f4f8ff'}}}}
+      });
+    }
+
+    function renderInteger(){
+      const tbody=document.querySelector('#integer-table tbody');
+      const grid=document.getElementById('impact-grid');
+      let total=0;tbody.innerHTML='';grid.innerHTML='';
+      integerData.forEach((row,index)=>{
+        const net=row.positive+row.negative;total+=net;
+        const tr=document.createElement('tr');
+        tr.innerHTML=`
+          <td contenteditable="true" onblur="integerData[${index}].week=this.innerText">${row.week}</td>
+          <td contenteditable="true" onblur="integerData[${index}].positive=parseFloat(this.innerText)||0">${row.positive}</td>
+          <td contenteditable="true" onblur="integerData[${index}].negative=parseFloat(this.innerText)||0">${row.negative}</td>
+          <td>${net>0?'+':''}${net}</td>`;
+        tbody.appendChild(tr);
+        const card=document.createElement('div');card.className=`impact-card ${net>=0?'positive':'negative'}`;card.innerHTML=`<h4>${row.week}</h4><p style="font-size:26px">${net>0?'+':''}${net} kg</p>`;grid.appendChild(card);
+      });
+      document.getElementById('impact-total').innerText=`${total>0?'+':''}${total} kg`;
+    }
+    function addIntegerRow(){integerData.push({week:`Semana ${integerData.length+1}`,positive:8,negative:-3});renderInteger();}
+
+    // STEAM
+    let steamCards=[{images:['',''],notes:'',tables:[createSteamTemplate()],title:'Evidencia 1'}];
+    let steamColumns=['Actividad','Medición'];
+    let steamRows=[['Preparación','5'],['Seguimiento','8']];
+    let steamTarget={card:null,slot:null};
+    const steamUpload=document.getElementById('steam-upload');
+    let steamChart=null;
+
+    function createSteamTemplate(){
+      return {name:'Tabla',columns:['Dato','Valor'],rows:[['pH','6.5'],['Humedad','70%']]};
+    }
+
+    function renderSteam(){
+      const gallery=document.getElementById('steam-gallery');
+      gallery.innerHTML='';
+      steamCards.forEach((card,index)=>{
+        const div=document.createElement('div');div.className='steam-card';
+        div.innerHTML=`<h3>${card.title||'Evidencia '+(index+1)}</h3>`;
+        const media=document.createElement('div');media.className='steam-media';
+        card.images.forEach((img,i)=>{
+          const slot=document.createElement('div');slot.className='media-slot';slot.dataset.card=index;slot.dataset.slot=i;
+          slot.innerHTML=img?`<img src="${img}" alt="evidencia">`:'<span>Subir imagen</span>';
+          slot.addEventListener('click',()=>{steamTarget={card:index,slot:i};steamUpload.click();});
+          media.appendChild(slot);
+        });
+        div.appendChild(media);
+        const textarea=document.createElement('textarea');textarea.value=card.notes||'';textarea.placeholder='Notas';textarea.oninput=()=>steamCards[index].notes=textarea.value;div.appendChild(textarea);
+        const group=document.createElement('div');group.className='steam-table-group';
+        card.tables.forEach((table,tIndex)=>{
+          const wrap=document.createElement('div');wrap.className='steam-inner-table';
+          wrap.innerHTML=`<div class="steam-table-toolbar">
+            <input value="${table.name}" oninput="steamCards[${index}].tables[${tIndex}].name=this.value" />
+            <button onclick="addTableColumn(${index},${tIndex})">+ Columna</button>
+            <button onclick="addTableRow(${index},${tIndex})">+ Fila</button>
+            <button class="danger" onclick="removeTable(${index},${tIndex})"><i class='fa fa-trash'></i></button>
+          </div>`;
+          const tbl=document.createElement('table');
+          tbl.innerHTML='<thead><tr>'+table.columns.map((col,cIndex)=>`<th contenteditable="true" oninput="renameTableColumn(${index},${tIndex},${cIndex},this.innerText)">${col}</th>`).join('')+'</tr></thead>';
+          const tbody=document.createElement('tbody');
+          table.rows.forEach((row,rIndex)=>{
+            const tr=document.createElement('tr');
+            tr.innerHTML=row.map((cell,cIndex)=>`<td contenteditable="true" oninput="updateTableCell(${index},${tIndex},${rIndex},${cIndex},this.innerText)">${cell}</td>`).join('');
+            tbody.appendChild(tr);
+          });
+          tbl.appendChild(tbody);wrap.appendChild(tbl);group.appendChild(wrap);
+        });
+        const addBtn=document.createElement('button');addBtn.className='btn';addBtn.innerHTML='<i class="fa fa-plus"></i> Tabla';addBtn.onclick=()=>{steamCards[index].tables.push(createSteamTemplate());renderSteam();};group.appendChild(addBtn);
+        div.appendChild(group);
+        gallery.appendChild(div);
+      });
+    }
+
+    steamUpload.addEventListener('change',e=>{
+      const file=e.target.files[0];if(!file) return;const reader=new FileReader();reader.onload=evt=>{steamCards[steamTarget.card].images[steamTarget.slot]=evt.target.result;renderSteam();};reader.readAsDataURL(file);
+    });
+    function addSteamCard(){steamCards.push({images:['',''],notes:'',tables:[createSteamTemplate()],title:`Evidencia ${steamCards.length+1}`});renderSteam();}
+    function addTableColumn(cardIndex,tableIndex){const table=steamCards[cardIndex].tables[tableIndex];table.columns.push('Col '+(table.columns.length+1));table.rows.forEach(r=>r.push(''));renderSteam();}
+    function addTableRow(cardIndex,tableIndex){const table=steamCards[cardIndex].tables[tableIndex];table.rows.push(new Array(table.columns.length).fill(''));renderSteam();}
+    function removeTable(cardIndex,tableIndex){steamCards[cardIndex].tables.splice(tableIndex,1);renderSteam();}
+    function renameTableColumn(cardIndex,tableIndex,colIndex,val){steamCards[cardIndex].tables[tableIndex].columns[colIndex]=val;}
+    function updateTableCell(cardIndex,tableIndex,rowIndex,colIndex,val){steamCards[cardIndex].tables[tableIndex].rows[rowIndex][colIndex]=val;}
+
+    // Steam main table
+    function renderSteamTable(){
+      const thead=document.querySelector('#steam-table thead');
+      const tbody=document.querySelector('#steam-table tbody');
+      thead.innerHTML='<tr>'+steamColumns.map((col,i)=>`<th contenteditable="true" oninput="steamColumns[${i}]=this.innerText">${col}</th>`).join('')+'</tr>';
+      tbody.innerHTML='';
+      steamRows.forEach((row,rIndex)=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML=row.map((cell,cIndex)=>`<td contenteditable="true" oninput="steamRows[${rIndex}][${cIndex}]=this.innerText">${cell}</td>`).join('');
+        tbody.appendChild(tr);
+      });
+      updateSteamSelects();
+    }
+    function addSteamColumn(){const name=document.getElementById('steam-new-col').value.trim()||`Col ${steamColumns.length+1}`;steamColumns.push(name);steamRows.forEach(row=>row.push(''));renderSteamTable();}
+    function addSteamRow(){steamRows.push(new Array(steamColumns.length).fill(''));renderSteamTable();}
+    function updateSteamSelects(){const x=document.getElementById('steam-x');const y=document.getElementById('steam-y');x.innerHTML='';y.innerHTML='';steamColumns.forEach((col,i)=>{const opt=document.createElement('option');opt.value=i;opt.textContent=col;x.appendChild(opt.cloneNode(true));y.appendChild(opt);});}
+    function buildSteamChart(){const xIndex=parseInt(document.getElementById('steam-x').value)||0;const yIndex=parseInt(document.getElementById('steam-y').value)||1;const type=document.getElementById('steam-chart-type').value;if(steamChart) steamChart.destroy();steamChart=new Chart(document.getElementById('steamChart'),{type:type,data:{labels:steamRows.map(r=>r[xIndex]),datasets:[{label:`${steamColumns[xIndex]} vs ${steamColumns[yIndex]}`,data:steamRows.map(r=>Number(r[yIndex])||0),backgroundColor:'rgba(62,192,255,.3)',borderColor:'#3ec0ff'}]},options:{plugins:{legend:{labels:{color:'#f4f8ff'}}}}});}
+
+    // Essays formatting
+    function applyFormat(cmd,value){document.execCommand(cmd,false,value);}
+
+    // Export image
+    async function exportImage(){const section=document.querySelector('.section.active');if(!section) return;const canvas=await html2canvas(section,{scale:2});const link=document.createElement('a');link.download=`Compost_${section.id}.png`;link.href=canvas.toDataURL('image/png');link.click();}
+
+    // Global JSON
+    function exportAllJSON(){const data={spanish:spanishDays,tracker:trackerData,integer:integerData,steam:{cards:steamCards,columns:steamColumns,rows:steamRows},essays:{science:document.getElementById('essay-science').innerHTML,english:document.getElementById('essay-english').innerHTML}};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='compost_system.json';a.click();}
+    document.getElementById('global-import').addEventListener('change',e=>{const file=e.target.files[0];if(!file) return;const reader=new FileReader();reader.onload=evt=>{const data=JSON.parse(evt.target.result);if(data.spanish) spanishDays=data.spanish;if(data.tracker) trackerData=data.tracker;if(data.integer) integerData=data.integer;if(data.steam){steamCards=data.steam.cards||steamCards;steamColumns=data.steam.columns||steamColumns;steamRows=data.steam.rows||steamRows;}if(data.essays){document.getElementById('essay-science').innerHTML=data.essays.science||'';document.getElementById('essay-english').innerHTML=data.essays.english||'';}renderSpanish();renderTracker();renderInteger();renderSteam();renderSteamTable();};reader.readAsText(file);});
+
+    // Initialize
+    renderSpanish();
+    renderTracker();
+    renderInteger();
+    renderSteam();
+    renderSteamTable();
+  </script>
+</body>
+</html>
